@@ -1,124 +1,102 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cctype>
-
+#include<iostream>
+#include<string>
 using namespace std;
 
-class BrowserHistory {
-private:
-    vector<string> history;
-    int currentIndex;
-    int methodCalls = 0; 
-    string homepage;
+class Node{
+   public: 
+    string url;
+    Node *prev;
+    Node *next;
 
-    bool isValidURL(const string& url) {
-        if (url.length() < 1 || url.length() > 20) {
-            return false;
-        }
-        for (int i = 0; i < url.length(); i++) {
-            char ch = url[i];
-            if (!islower(ch) && ch != '.') {
-                return false;
-            }
-        }
-        return true;
-    }
-
-public:
-    BrowserHistory(string homepage) {
-        if (!isValidURL(homepage)) {
-            return;
-        }
-        this->homepage = homepage;
-        history.push_back(homepage);
-        currentIndex = 0;
-    }
-
-    void visit(string url) {
-        if (methodCalls >= 5000) return;
-
-        if (!isValidURL(url) || url.find('.') == string::npos) {
-            cout << "NULL.\n";
-            return;
-        }
-
-        history.resize(currentIndex + 1);
-        history.push_back(url);
-        currentIndex++;
-        methodCalls++;
-    }
-
-    string back(int steps) {
-        if (methodCalls >= 5000) return history[currentIndex];
-
-        if (currentIndex - steps < 0) {
-            currentIndex = 0;
-            return homepage;
-        }
-
-        currentIndex = max(0, currentIndex - steps);
-        methodCalls++;
-        return history[currentIndex];
-    }
-
-    string forward(int steps) {
-        if (methodCalls >= 5000) return history[currentIndex];
-
-        if (currentIndex + steps >= history.size()) {
-            currentIndex = history.size() - 1;
-            return history[currentIndex];
-        }
-
-        currentIndex = min((int)history.size() - 1, currentIndex + steps);
-        methodCalls++;
-        return history[currentIndex];
-    }
+    Node(string url) : url(url), prev(NULL), next(NULL) {}
 };
 
-int main() {
-    string homepage;
-    cout << "Enter the homepage URL: ";
-    cin >> homepage;
-
-    BrowserHistory browserHistory(homepage);
-
-    int choice;
-    string url;
-    int steps;
-
-    do {
-        cout << "1. Visit a new URL\n";
-        cout << "2. Go back steps\n";
-        cout << "3. Go forward steps\n";
-        cout << "4. Exit\n";
-        cout << "Enter your choice (1-4): ";
-        cin >> choice;
-
-        switch (choice) {
-            case 1:
-                cout << "Enter the URL to visit: ";
-                cin >> url;
-                browserHistory.visit(url);
-                break;
-            case 2:
-                cout << "Enter the number of steps to go back: ";
-                cin >> steps;
-                cout << "Current URL after going back: " << browserHistory.back(steps) << endl;
-                break;
-            case 3:
-                cout << "Enter the number of steps to go forward: ";
-                cin >> steps;
-                cout << "Current URL after going forward: " << browserHistory.forward(steps) << endl;
-                break;
-            case 4:
-                cout << "Exiting browser history.\n";
-                break;
-            default:
-                cout << "Invalid choice. Please select a valid option.\n";
+class BrowserHistory{
+    private:
+        Node *head;
+        Node *current;
+        Node *tail;
+    
+    public:
+        BrowserHistory(string homePage){
+            head = new Node(homePage);
+            current = head;
+            tail = head;
         }
-    } while (choice != 4);
+
+        void visit(string newUrl){
+            Node *newNode = new Node(newUrl);
+            current->next = newNode;
+            newNode->prev = current;
+            current = newNode;
+        }
+
+        string back(int number){
+            if(current == head){
+                cout << head->url;
+            } else {
+                while(current->prev != NULL && number > 0){
+                    current = current->prev;
+                    number--;
+                }
+                return current->url;
+            }
+        }
+
+        string forward(int number){
+            if(current == tail){
+                cout << tail->url;
+            } else {
+                while(current->next != NULL && number > 0){
+                    current = current->next;
+                    number--;
+                }
+                return current->url;
+            }
+        }
+
+};
+
+int main(){
+    string homePage;
+    cout << "Enter home page: " << endl;
+    getline(cin, homePage);
+
+    BrowserHistory browser(homePage);
+
+    string command;
+    while(1){
+        cout << "Enter commands: visit, back, forward, exit." << endl;
+        cin >> command;
+        
+        if(command == "visit"){
+            string url;
+            cout << "Enter url: " << endl;
+            cin.ignore();
+            getline(cin, url);
+            browser.visit(url);
+            cout << "null" << endl;
+        } else if (command == "back") {
+            int number;
+            cout << "Enter number of steps back: " << endl;
+            cin >> number;
+            cout << "Currently on page: " << endl;
+            cin.ignore();
+            cout << browser.back(number) << endl;
+        } else if (command == "forward") {
+            int number;
+            cout << "Enter number of steps forward: " << endl;
+            cin >> number;
+            cout << "Currently on page: " << endl;
+            cin.ignore();
+            cout << browser.forward(number) << endl;
+        } else if (command == "exit") {
+            break;
+        } else {
+            cout << "Invalid command!" << endl;
+        }
+
+    }
 
     return 0;
 }
-
