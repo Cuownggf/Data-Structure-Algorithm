@@ -1,3 +1,8 @@
+//STT: 7
+//Full Name: Nguyễn Minh Cường
+//InClass - Part 1
+//Notes or Remarks: ......
+
 #include <iostream>
 using namespace std;
 
