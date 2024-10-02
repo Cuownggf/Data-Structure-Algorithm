@@ -1,3 +1,8 @@
+//STT: 7
+//Full Name: Nguyễn Minh Cường
+//Homework 01 - Exercise 01
+//Notes or Remarks: ......
+
 #include<iostream>
 #include <string>
 
